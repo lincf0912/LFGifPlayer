@@ -47,4 +47,15 @@ typedef void (^GifFail) (NSString *key);
  *  @param failBlock      失败回调 一次
  */
 - (void)transformGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock;
+
+
+/**
+ 播放gif一次
+
+ @param gifData 文件数据
+ @param key gif标记
+ @param executionBlock 成功回调
+ @param failBlock 失败回调
+ */
+- (void)transformOnceGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock;
 @end

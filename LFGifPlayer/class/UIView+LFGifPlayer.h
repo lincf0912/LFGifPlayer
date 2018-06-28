@@ -14,6 +14,7 @@
 @property (nonatomic, strong) UIImage *lf_gifFailImage;
 
 - (void)lf_playGif;
+- (void)lf_playGifOnce;
 - (void)lf_stopGif;
 - (BOOL)lf_isPlayGif;
 

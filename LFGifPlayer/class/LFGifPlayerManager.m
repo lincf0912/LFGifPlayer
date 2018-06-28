@@ -13,6 +13,7 @@
 @interface GifSource : NSObject
 
 @property (nonatomic, copy) NSString *key;
+@property (nonatomic, assign) BOOL isPlayOnce;
 
 @property (nonatomic, copy) NSString *gifPath;
 @property (nonatomic, strong) NSData *gifData;
@@ -88,6 +89,9 @@ static LFGifPlayerManager *_sharedInstance = nil;
     for (NSString *key in self.gifSourceMapTable) {
         GifSource *ref = [self.gifSourceMapTable objectForKey:key];
         [self playGif:ref];
+        if (!_displayLink || _displayLink.paused) {
+            break;
+        }
     }
     
 }
@@ -100,6 +104,7 @@ static LFGifPlayerManager *_sharedInstance = nil;
 }
 - (void)stopGIFWithKey:(NSString *)key
 {
+    self.displayLink.paused = YES;
     GifSource *ref = [self.gifSourceMapTable objectForKey:key];
     if (ref) {
         [self.gifSourceMapTable removeObjectForKey:key];
@@ -111,6 +116,8 @@ static LFGifPlayerManager *_sharedInstance = nil;
 
     if (_gifSourceMapTable.count<1 && _displayLink) {
         [self stopDisplayLink];
+    } else {
+        self.displayLink.paused = NO;
     }
 }
 
@@ -137,21 +144,27 @@ static LFGifPlayerManager *_sharedInstance = nil;
 
 - (void)transformGifPathToSampBufferRef:(NSString *)gifPath key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock
 {
-    [self transformGifToSampBufferRef:gifPath key:key execution:executionBlock fail:failBlock];
+    [self transformGifToSampBufferRef:gifPath key:key once:NO execution:executionBlock fail:failBlock];
 }
 
 - (void)transformGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock
 {
-    [self transformGifToSampBufferRef:gifData key:key execution:executionBlock fail:failBlock];
+    [self transformGifToSampBufferRef:gifData key:key once:NO execution:executionBlock fail:failBlock];
 }
 
-- (void)transformGifToSampBufferRef:(id)data key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock
+- (void)transformOnceGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock
+{
+    [self transformGifToSampBufferRef:gifData key:key once:YES execution:executionBlock fail:failBlock];
+}
+
+- (void)transformGifToSampBufferRef:(id)data key:(NSString *)key once:(BOOL)once execution:(GifExecution)executionBlock fail:(GifFail)failBlock
 {
     if (key && data && executionBlock && failBlock) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
             GifSource *existGifSource = [self.gifSourceMapTable objectForKey:key];
             if (!existGifSource) {
                 GifSource *gifSource = [self imageSourceCreateWithData:data];
+                gifSource.isPlayOnce = once;
                 gifSource.key = key;
                 gifSource.execution = [executionBlock copy];
                 gifSource.fail = [failBlock copy];
@@ -162,6 +175,7 @@ static LFGifPlayerManager *_sharedInstance = nil;
                     [self.gifSourceMapTable setObject:gifSource forKey:key];
                 });
             } else {
+                existGifSource.isPlayOnce = once;
                 existGifSource.execution = [executionBlock copy];
                 existGifSource.fail = [failBlock copy];
             }
@@ -185,11 +199,19 @@ static LFGifPlayerManager *_sharedInstance = nil;
     }
     
     float nextFrameDuration = [self frameDurationAtIndex:sizeMin ref:gifSource.gifSourceRef];
+   
     if (gifSource.timestamp < nextFrameDuration) {
         gifSource.timestamp = gifSource.timestamp+self.displayLink.duration;
+       
         return;
     }
     gifSource.index += 1;
+    if (gifSource.isPlayOnce) { /** 播放一次即停止 */
+        if (gifSource.index >= gifSource.frameCount) {
+            [self stopGIFWithKey:gifSource.key];
+            return;
+        }
+    }
     gifSource.index = gifSource.index % gifSource.frameCount;
     CGImageSourceRef ref = gifSource.gifSourceRef;
     CGImageRef imageRef = CGImageSourceCreateImageAtIndex(ref, gifSource.index, NULL);

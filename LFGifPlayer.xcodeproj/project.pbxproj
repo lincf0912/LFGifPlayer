@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C70FDAB920E478F60053A02C /* UIView+LFGifPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = C70FDAB620E478F60053A02C /* UIView+LFGifPlayer.m */; };
+		C70FDABA20E478F60053A02C /* LFGifPlayerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C70FDAB720E478F60053A02C /* LFGifPlayerManager.m */; };
+		C70FDABB20E478F60053A02C /* LFWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = C70FDAB820E478F60053A02C /* LFWeakProxy.m */; };
 		C7269F862099504800A88CA7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C7269F852099504800A88CA7 /* AppDelegate.m */; };
 		C7269F892099504800A88CA7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7269F882099504800A88CA7 /* ViewController.m */; };
 		C7269F8C2099504800A88CA7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7269F8A2099504800A88CA7 /* Main.storyboard */; };
@@ -14,13 +17,16 @@
 		C7269F912099504900A88CA7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7269F8F2099504900A88CA7 /* LaunchScreen.storyboard */; };
 		C7269F942099504900A88CA7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C7269F932099504900A88CA7 /* main.m */; };
 		C7269FAB2099574000A88CA7 /* MyCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7269FAA2099574000A88CA7 /* MyCollectionViewController.m */; };
-		C7269FB32099577D00A88CA7 /* UIView+LFGifPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = C7269FB02099577D00A88CA7 /* UIView+LFGifPlayer.m */; };
-		C7269FB42099577D00A88CA7 /* LFGifPlayerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C7269FB12099577D00A88CA7 /* LFGifPlayerManager.m */; };
-		C7269FB52099577D00A88CA7 /* LFWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = C7269FB22099577D00A88CA7 /* LFWeakProxy.m */; };
 		C7269FB72099579000A88CA7 /* 4.gif in Resources */ = {isa = PBXBuildFile; fileRef = C7269FB62099579000A88CA7 /* 4.gif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C70FDAB320E478F60053A02C /* UIView+LFGifPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+LFGifPlayer.h"; sourceTree = "<group>"; };
+		C70FDAB420E478F60053A02C /* LFWeakProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFWeakProxy.h; sourceTree = "<group>"; };
+		C70FDAB520E478F60053A02C /* LFGifPlayerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFGifPlayerManager.h; sourceTree = "<group>"; };
+		C70FDAB620E478F60053A02C /* UIView+LFGifPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+LFGifPlayer.m"; sourceTree = "<group>"; };
+		C70FDAB720E478F60053A02C /* LFGifPlayerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFGifPlayerManager.m; sourceTree = "<group>"; };
+		C70FDAB820E478F60053A02C /* LFWeakProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFWeakProxy.m; sourceTree = "<group>"; };
 		C7269F812099504800A88CA7 /* LFGifPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LFGifPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7269F842099504800A88CA7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C7269F852099504800A88CA7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -33,12 +39,6 @@
 		C7269F932099504900A88CA7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C7269FA92099574000A88CA7 /* MyCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCollectionViewController.h; sourceTree = "<group>"; };
 		C7269FAA2099574000A88CA7 /* MyCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyCollectionViewController.m; sourceTree = "<group>"; };
-		C7269FAD2099577D00A88CA7 /* UIView+LFGifPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+LFGifPlayer.h"; sourceTree = "<group>"; };
-		C7269FAE2099577D00A88CA7 /* LFWeakProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFWeakProxy.h; sourceTree = "<group>"; };
-		C7269FAF2099577D00A88CA7 /* LFGifPlayerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFGifPlayerManager.h; sourceTree = "<group>"; };
-		C7269FB02099577D00A88CA7 /* UIView+LFGifPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+LFGifPlayer.m"; sourceTree = "<group>"; };
-		C7269FB12099577D00A88CA7 /* LFGifPlayerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFGifPlayerManager.m; sourceTree = "<group>"; };
-		C7269FB22099577D00A88CA7 /* LFWeakProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFWeakProxy.m; sourceTree = "<group>"; };
 		C7269FB62099579000A88CA7 /* 4.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = 4.gif; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -53,6 +53,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C70FDAB220E478F60053A02C /* class */ = {
+			isa = PBXGroup;
+			children = (
+				C70FDAB320E478F60053A02C /* UIView+LFGifPlayer.h */,
+				C70FDAB420E478F60053A02C /* LFWeakProxy.h */,
+				C70FDAB520E478F60053A02C /* LFGifPlayerManager.h */,
+				C70FDAB620E478F60053A02C /* UIView+LFGifPlayer.m */,
+				C70FDAB720E478F60053A02C /* LFGifPlayerManager.m */,
+				C70FDAB820E478F60053A02C /* LFWeakProxy.m */,
+			);
+			path = class;
+			sourceTree = "<group>";
+		};
 		C7269F782099504800A88CA7 = {
 			isa = PBXGroup;
 			children = (
@@ -72,7 +85,7 @@
 		C7269F832099504800A88CA7 /* LFGifPlayer */ = {
 			isa = PBXGroup;
 			children = (
-				C7269FAC2099577D00A88CA7 /* LFGifPlayer */,
+				C70FDAB220E478F60053A02C /* class */,
 				C7269F842099504800A88CA7 /* AppDelegate.h */,
 				C7269F852099504800A88CA7 /* AppDelegate.m */,
 				C7269F872099504800A88CA7 /* ViewController.h */,
@@ -85,19 +98,6 @@
 				C7269F8F2099504900A88CA7 /* LaunchScreen.storyboard */,
 				C7269F922099504900A88CA7 /* Info.plist */,
 				C7269F932099504900A88CA7 /* main.m */,
-			);
-			path = LFGifPlayer;
-			sourceTree = "<group>";
-		};
-		C7269FAC2099577D00A88CA7 /* LFGifPlayer */ = {
-			isa = PBXGroup;
-			children = (
-				C7269FAD2099577D00A88CA7 /* UIView+LFGifPlayer.h */,
-				C7269FB02099577D00A88CA7 /* UIView+LFGifPlayer.m */,
-				C7269FAF2099577D00A88CA7 /* LFGifPlayerManager.h */,
-				C7269FB12099577D00A88CA7 /* LFGifPlayerManager.m */,
-				C7269FAE2099577D00A88CA7 /* LFWeakProxy.h */,
-				C7269FB22099577D00A88CA7 /* LFWeakProxy.m */,
 			);
 			path = LFGifPlayer;
 			sourceTree = "<group>";
@@ -176,10 +176,10 @@
 				C7269F892099504800A88CA7 /* ViewController.m in Sources */,
 				C7269F942099504900A88CA7 /* main.m in Sources */,
 				C7269FAB2099574000A88CA7 /* MyCollectionViewController.m in Sources */,
-				C7269FB42099577D00A88CA7 /* LFGifPlayerManager.m in Sources */,
+				C70FDABA20E478F60053A02C /* LFGifPlayerManager.m in Sources */,
 				C7269F862099504800A88CA7 /* AppDelegate.m in Sources */,
-				C7269FB32099577D00A88CA7 /* UIView+LFGifPlayer.m in Sources */,
-				C7269FB52099577D00A88CA7 /* LFWeakProxy.m in Sources */,
+				C70FDAB920E478F60053A02C /* UIView+LFGifPlayer.m in Sources */,
+				C70FDABB20E478F60053A02C /* LFWeakProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
