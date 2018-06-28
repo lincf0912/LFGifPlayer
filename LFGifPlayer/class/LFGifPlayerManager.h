@@ -13,11 +13,17 @@
 typedef void (^GifExecution) (CGImageRef imageData, NSString *key);
 typedef void (^GifFail) (NSString *key);
 
+FOUNDATION_EXPORT NSRunLoopMode const NSDefaultRunLoopMode;
+FOUNDATION_EXPORT NSRunLoopMode const NSRunLoopCommonModes;
+
 @interface LFGifPlayerManager : NSObject
 
 + (LFGifPlayerManager *)shared;
 /** 释放 */
 + (void)free;
+
+/** 模式 default is NSRunLoopCommonModes */
+@property (nonatomic, copy) NSRunLoopMode currentMode;
 
 /** 停止播放 */
 - (void)stopGIFWithKey:(NSString *)key;

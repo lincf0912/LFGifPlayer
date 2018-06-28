@@ -67,6 +67,7 @@ static LFGifPlayerManager *_sharedInstance = nil;
     self = [super init];
     if (self) {
         _gifSourceMapTable = [NSMapTable mapTableWithKeyOptions:NSMapTableWeakMemory valueOptions:NSMapTableStrongMemory];
+        _currentMode = NSRunLoopCommonModes;
     }
     return self;
 }
@@ -182,7 +183,7 @@ static LFGifPlayerManager *_sharedInstance = nil;
         });
         if (!self.displayLink) {
             self.displayLink = [CADisplayLink displayLinkWithTarget:[LFWeakProxy proxyWithTarget:self] selector:@selector(play)];
-            [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+            [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:self.currentMode];
         }
     }
 }
