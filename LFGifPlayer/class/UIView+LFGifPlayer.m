@@ -40,7 +40,7 @@ static char LFGifFailImageKey;
     __weak typeof(self) weakSelf = self;
     NSString *p = [NSString stringWithFormat:@"%p", self];
 
-    [[LFGifPlayerManager shared] transformGifDataToSampBufferRef:weakSelf.lf_gifData key:p execution:^(CGImageRef imageData, NSString *key) {
+    [[LFGifPlayerManager shared] transformGifDataToSampBufferRef:self.lf_gifData key:p execution:^(CGImageRef imageData, NSString *key) {
         if ([p isEqualToString:key]) {
             weakSelf.layer.contents = (__bridge id _Nullable)(imageData);
         }
@@ -55,8 +55,7 @@ static char LFGifFailImageKey;
 {
     __weak typeof(self) weakSelf = self;
     NSString *p = [NSString stringWithFormat:@"%p", self];
-    
-    [[LFGifPlayerManager shared] transformOnceGifDataToSampBufferRef:weakSelf.lf_gifData key:p execution:^(CGImageRef imageData, NSString *key) {
+    [[LFGifPlayerManager shared] transformGifDataToSampBufferRef:self.lf_gifData key:p loopCount:1 execution:^(CGImageRef imageData, NSString *key) {
         if ([p isEqualToString:key]) {
             weakSelf.layer.contents = (__bridge id _Nullable)(imageData);
         }

@@ -10,24 +10,54 @@
 
 #import "LFWeakProxy.h"
 
+inline static NSTimeInterval CGImageSourceGetGifFrameDelay(CGImageSourceRef imageSource, NSUInteger index)
+{
+    NSTimeInterval frameDuration = 0;
+
+    CFDictionaryRef dictRef = CGImageSourceCopyPropertiesAtIndex(imageSource, index, NULL);
+    NSDictionary *dict = (__bridge NSDictionary *)dictRef;
+    NSDictionary *gifDict = (dict[(NSString *)kCGImagePropertyGIFDictionary]);
+    NSNumber *unclampedDelayTime = gifDict[(NSString *)kCGImagePropertyGIFUnclampedDelayTime];
+    NSNumber *delayTime = gifDict[(NSString *)kCGImagePropertyGIFDelayTime];
+    if (dictRef) CFRelease(dictRef);
+    if (unclampedDelayTime.floatValue) {
+        frameDuration = unclampedDelayTime.floatValue;
+    }else if (delayTime.floatValue) {
+        frameDuration = delayTime.floatValue;
+    }else{
+        frameDuration = .1;
+    }
+    return frameDuration;
+}
+
 @interface GifSource : NSObject
 
 @property (nonatomic, copy) NSString *key;
-@property (nonatomic, assign) BOOL isPlayOnce;
+@property (nonatomic, assign) NSUInteger loopCount;
+@property (nonatomic, assign) NSUInteger playCount;
 
 @property (nonatomic, copy) NSString *gifPath;
 @property (nonatomic, strong) NSData *gifData;
 @property (nonatomic, assign) NSInteger index;
 @property (nonatomic, readonly) NSInteger frameCount;
-@property (nonatomic, assign) CGFloat timestamp;
 @property (nonatomic, assign) CGImageSourceRef gifSourceRef;
 
 @property (nonatomic, copy) GifExecution execution;
 @property (nonatomic, copy) GifFail fail;
+
+@property (nonatomic, readonly) NSTimeInterval *frameDurations;
+
+@property (nonatomic, assign) NSTimeInterval accumulator;
+
+
 @end
 
 @implementation GifSource
+
 @synthesize frameCount = _frameCount;
+
+@synthesize frameDurations = _frameDurations;
+
 
 - (NSInteger)frameCount
 {
@@ -35,6 +65,18 @@
         _frameCount = CGImageSourceGetCount(self.gifSourceRef);
     }
     return _frameCount;
+}
+
+- (NSTimeInterval *)frameDurations
+{
+    if (!_frameDurations) {
+        _frameDurations = (NSTimeInterval *)malloc(self.frameCount  * sizeof(NSTimeInterval));
+        for (NSUInteger i = 0; i < self.frameCount; i ++) {
+            NSTimeInterval frameDuration = CGImageSourceGetGifFrameDelay(self.gifSourceRef, i);
+            self.frameDurations[i] = frameDuration;
+        }
+    }
+    return _frameDurations;
 }
 
 @end
@@ -145,38 +187,47 @@ static LFGifPlayerManager *_sharedInstance = nil;
 
 - (void)transformGifPathToSampBufferRef:(NSString *)gifPath key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock
 {
-    [self transformGifToSampBufferRef:gifPath key:key once:NO execution:executionBlock fail:failBlock];
+    [self transformGifToSampBufferRef:gifPath key:key loopCount:0 execution:executionBlock fail:failBlock];
 }
 
 - (void)transformGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock
 {
-    [self transformGifToSampBufferRef:gifData key:key once:NO execution:executionBlock fail:failBlock];
+    [self transformGifToSampBufferRef:gifData key:key loopCount:0 execution:executionBlock fail:failBlock];
 }
 
-- (void)transformOnceGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock
+- (void)transformGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key loopCount:(NSUInteger)loopCount execution:(GifExecution)executionBlock fail:(GifFail)failBlock
 {
-    [self transformGifToSampBufferRef:gifData key:key once:YES execution:executionBlock fail:failBlock];
+    [self transformGifToSampBufferRef:gifData key:key loopCount:loopCount execution:executionBlock fail:failBlock];
 }
 
-- (void)transformGifToSampBufferRef:(id)data key:(NSString *)key once:(BOOL)once execution:(GifExecution)executionBlock fail:(GifFail)failBlock
+- (void)transformGifToSampBufferRef:(id)data key:(NSString *)key loopCount:(NSUInteger)loopCount execution:(GifExecution)executionBlock fail:(GifFail)failBlock
 {
     if (key && data && executionBlock && failBlock) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
             GifSource *existGifSource = [self.gifSourceMapTable objectForKey:key];
             if (!existGifSource) {
                 GifSource *gifSource = [self imageSourceCreateWithData:data];
-                gifSource.isPlayOnce = once;
+                gifSource.loopCount = loopCount;
                 gifSource.key = key;
                 gifSource.execution = [executionBlock copy];
                 gifSource.fail = [failBlock copy];
                 if (!gifSource) {
                     return;
                 }
+                
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    size_t sizeMin = MIN(gifSource.index+1, gifSource.frameCount-1);
+                    if (sizeMin == SIZE_MAX) {
+                        //若该Gif文件无法解释为图片，需要立即返回避免内存crash
+                        gifSource.fail(gifSource.key);
+                        [self stopGIFWithKey:gifSource.key];
+                        return;
+                    }
                     [self.gifSourceMapTable setObject:gifSource forKey:key];
                 });
             } else {
-                existGifSource.isPlayOnce = once;
+                existGifSource.playCount = 0;
+                existGifSource.loopCount = loopCount;
                 existGifSource.execution = [executionBlock copy];
                 existGifSource.fail = [failBlock copy];
             }
@@ -191,53 +242,28 @@ static LFGifPlayerManager *_sharedInstance = nil;
 
 - (void)playGif:(GifSource *)gifSource
 {
-    size_t sizeMin = MIN(gifSource.index+1, gifSource.frameCount-1);
-    if (sizeMin == SIZE_MAX) {
-        //若该Gif文件无法解释为图片，需要立即返回避免内存crash
-        gifSource.fail(gifSource.key);
-        [self stopGIFWithKey:gifSource.key];
-        return;
-    }
+    gifSource.accumulator += fmin(_displayLink.duration, 1);
     
-    float nextFrameDuration = [self frameDurationAtIndex:sizeMin ref:gifSource.gifSourceRef];
-   
-    if (gifSource.timestamp < nextFrameDuration) {
-        gifSource.timestamp = gifSource.timestamp+self.displayLink.duration;
-       
-        return;
-    }
-    gifSource.index += 1;
-    if (gifSource.isPlayOnce) { /** 播放一次即停止 */
-        if (gifSource.index >= gifSource.frameCount) {
-            [self stopGIFWithKey:gifSource.key];
-            return;
+    while (gifSource.accumulator >= gifSource.frameDurations[gifSource.index]) {
+        gifSource.accumulator -= gifSource.frameDurations[gifSource.index];
+        gifSource.index = MIN(gifSource.index, gifSource.frameCount - 1);
+        CGImageSourceRef ref = gifSource.gifSourceRef;
+        CGImageRef imageRef = CGImageSourceCreateImageAtIndex(ref, gifSource.index, NULL);
+        
+        gifSource.execution(imageRef, gifSource.key);
+        
+        CGImageRelease(imageRef);
+
+        if (++gifSource.index >= gifSource.frameCount) {
+            gifSource.index = 0;
+            if (gifSource.loopCount == ++gifSource.playCount) { /** 超出播放次数停止 */
+                [self stopGIFWithKey:gifSource.key];
+                return;
+            }
         }
     }
-    gifSource.index = gifSource.index % gifSource.frameCount;
-    CGImageSourceRef ref = gifSource.gifSourceRef;
-    CGImageRef imageRef = CGImageSourceCreateImageAtIndex(ref, gifSource.index, NULL);
     
-    gifSource.execution(imageRef, gifSource.key);
-    
-    CGImageRelease(imageRef);
-    gifSource.timestamp = 0.f;
 }
 
-- (float)frameDurationAtIndex:(size_t)index ref:(CGImageSourceRef)ref
-{
-    CFDictionaryRef dictRef = CGImageSourceCopyPropertiesAtIndex(ref, index, NULL);
-    NSDictionary *dict = (__bridge NSDictionary *)dictRef;
-    NSDictionary *gifDict = (dict[(NSString *)kCGImagePropertyGIFDictionary]);
-    NSNumber *unclampedDelayTime = gifDict[(NSString *)kCGImagePropertyGIFUnclampedDelayTime];
-    NSNumber *delayTime = gifDict[(NSString *)kCGImagePropertyGIFDelayTime];
-    if (dictRef) CFRelease(dictRef);
-    if (unclampedDelayTime.floatValue) {
-        return unclampedDelayTime.floatValue;
-    }else if (delayTime.floatValue) {
-        return delayTime.floatValue;
-    }else{
-        return .1;
-    }
-}
 
 @end

@@ -56,12 +56,12 @@ FOUNDATION_EXPORT NSRunLoopMode const NSRunLoopCommonModes;
 
 
 /**
- 播放gif一次
+ 播放gif(限制次数)
 
  @param gifData 文件数据
  @param key gif标记
  @param executionBlock 成功回调
  @param failBlock 失败回调
  */
-- (void)transformOnceGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key execution:(GifExecution)executionBlock fail:(GifFail)failBlock;
+- (void)transformGifDataToSampBufferRef:(NSData *)gifData key:(NSString *)key loopCount:(NSUInteger)loopCount execution:(GifExecution)executionBlock fail:(GifFail)failBlock;
 @end
