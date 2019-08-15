@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = 'LFGifPlayer'
-s.version      = '1.0.1'
+s.version      = '1.0.2'
 s.summary      = 'Gif player.'
 s.homepage     = 'https://github.com/lincf0912/LFGifPlayer'
 s.license      = 'MIT'
